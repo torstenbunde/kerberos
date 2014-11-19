@@ -1,0 +1,21 @@
+#!/bin/sh
+
+slaves="krb5-slave1 krb5-slave2";
+
+for slave in $slaves; do
+  echo "krb_syncfiles to slave $slave";
+  /usr/bin/rsync -av /etc/krb5.conf $slave:/etc/;
+  /usr/bin/rsync -av /etc/krb5.keytab $slave:/etc/;
+  /usr/bin/rsync -av /etc/krb5kdc/kdc.conf $slave:/etc/krb5kdc/;
+  /usr/bin/rsync -av /etc/krb5kdc/kadm5.acl $slave:/etc/krb5kdc/;
+  /usr/bin/rsync -av /etc/krb5kdc/stash $slave:/etc/krb5kdc/;
+  /usr/bin/rsync -av /etc/krb5kdc/service.keyfile $slave:/etc/krb5kdc/;
+  error=$?;
+  if [ $error -ne 0 ]; then
+    echo "Kerberos syncfiles to host $slave failed.";
+  fi
+  echo "\n";
+done
+exit 0;
+
+# end of file
