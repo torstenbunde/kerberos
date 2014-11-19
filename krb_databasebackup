@@ -1,0 +1,19 @@
+#!/bin/sh
+
+slaves="krb5-slave1 krb5-slave2";
+
+/usr/sbin/kdb5_util dump /var/lib/krb5kdc/backup_database;
+error=$?
+if [ $error -ne 0 ]; then
+  echo "Kerberos database dump failed.";
+  exit 1;
+fi
+
+for slave in $slaves; do
+  /usr/bin/rsync -av /var/lib/krb5kdc/backup_database $slave:/var/lib/krb5kdc/;
+  /usr/bin/rsync -av /var/lib/krb5kdc/backup_database.dump_ok $slave:/var/lib/krb5kdc/;
+done
+
+exit 0;
+
+# end of file
