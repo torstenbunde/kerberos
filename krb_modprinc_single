@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+use DBI qw(:sql_types);
+use encoding 'iso-8859-1';
+use Getopt::Long;
+use IO::Scalar;
+use strict;
+
+my $user;
+my $option;
+GetOptions( 'user=s'   => \$user,
+	    'option=s' => \$option, );
+if ( !$user or !$option ) {
+  print STDERR "usage $0 --user=<Loginname> --option='<Option(en)>'\n\n";
+  print "user\tloginname of the user.\n";
+  print "option\toption(s) that should be added or changed (i. e.: +allow_forwardable\n\tor -maxrenewlife 7days) or deleted (-allow_renewable).\n\tAlso possible: \"+allow_forwardable -allow_renewable\"\n\n";
+  exit 1;
+}
+
+my $query = "modprinc $option $user";
+print "Changing option(s) for principal " . $user . "\n";
+print "Testing of set flags is possible by klist -f (as the requested user)\n";
+my $modprinc = `/usr/bin/kadmin -q '$query'`;
+
+# end of file
