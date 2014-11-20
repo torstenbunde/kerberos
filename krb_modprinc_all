@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+use DBI qw(:sql_types);
+use encoding 'iso-8859-1';
+use Getopt::Long;
+use IO::Scalar;
+use strict;
+
+my $option;
+GetOptions( 'option=s' => \$option, );
+if ( !$option ) {
+  print STDERR "usage $0 --option='<Option(en)>'\n\n";
+  print "option\tOption(s) that should be added/changed (i. e.: +allow_forwardable\n\tor -maxrenewlife 7days) or deleted (-allow_renewable).\n\tOptions re also possible as: \"+allow_forwardable -allow_renewable\"\n\n";
+  exit 1;
+}
+
+my $command = "listprincs *";
+my $query = "modprinc $option";
+my $comstr = `/usr/bin/kadmin -q '$command'`;
+my @array = split /\n+/, $comstr;
+
+foreach my $zeile ( @array ) {
+  print "Changing option(s) for principal " . $zeile . "\n";
+  my $modprinc = `/usr/bin/kadmin -q '$query $zeile'`;
+}
+print "To test the actual flags use klist -f (as the requested user).\n";
+
+# end of file
